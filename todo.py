@@ -1,3 +1,4 @@
+from turtle import title
 from flask import Flask, app, jsonify, request
 
 
@@ -8,6 +9,12 @@ todos = [
 ]
 
 app = Flask(__name__)
+
+def get_next_id():
+    if not todos:
+        return 1
+    else:
+        return todos[-1]['id'] + 1
 
 @app.route('/todos', methods=['GET'])
 def get_todos():
@@ -22,9 +29,18 @@ def get_single_todo(todo_id):
         else:
             return jsonify({'error': "Todo not found"}), 404
 
-# @app.route('/todos', methods=['POST'])
-# def post_todo():
-#     if request.json
+@app.route('/todos', methods=['POST'])
+def post_todo():
+    if not request.json or 'title' not in request.json:
+        return jsonify({"error": "Title is required"}), 400
+        
+    new_todo = {
+        "id" : get_next_id(),
+        "title": request.json["title"],
+        "completed" : request.json["completed"]
+    }
+    todos.append(new_todo)
+    return jsonify(new_todo, 201)
 
 @app.route('/')
 def welcome():
