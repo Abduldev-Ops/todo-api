@@ -43,10 +43,46 @@ def post_todo():
     todos.append(new_todo)
     return jsonify(new_todo, 201)
 
+@app.route('/todos/<int:todo_id>', methods=['PUT'])
+def update_todo(todo_id):
+    for i in todos:
+        if i['id'] == todo_id:
+            todo = i
+
+    if todo is None:
+        return jsonify({'error': 'Todo not found'}), 404
+    
+    if not request.json:
+        return jsonify({'error': 'Request must be JSON'}), 404
+
+    todo['title'] = request.json.get('title', todo['title'])
+    todo['completed'] = request.json.get('completed', todo['completed'])
+
+    return jsonify(todo), 200
+
+
+@app.route('/todos/<int:todo_id>', methods=['DELETE'])
+def delete_todo(todo_id):
+    for i in todos:
+        if i['id'] == todo_id:
+            todo = i
+
+    if todo is None:
+        return jsonify({'error': 'Todo not found'}), 404
+
+    todos.remove(todo)
+    return jsonify({'message': "Todo deleted successfully"}), 200
+
 @app.route('/')
 def welcome():
-    return jsonify("Welcome to my First Api")
-
+    return jsonify({"message": "Welcome to Todo API",
+                    "endpoints": {
+                        "GET /todos": "Get all todos",
+                        "GET /todos/<id>": "Get a specific todo",
+                        "POST /todos": "Create a new todo",
+                        "PUT /todos/<id>": "Update a todo",
+                        "DELETE /todos/<id>": "Delete a todo"
+                    }})
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
