@@ -31,6 +31,7 @@ def get_single_todo(todo_id):
 
 @app.route('/todos', methods=['POST'])
 def post_todo():
+    # request is from user (postman) and is given in json 
     if not request.json or 'title' not in request.json:
         return jsonify({"error": "Title is required"}), 400
         
