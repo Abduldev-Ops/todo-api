@@ -41,7 +41,7 @@ def post_todo():
         "completed" : request.json["completed"]
     }
     todos.append(new_todo)
-    return jsonify(new_todo, 201)
+    return jsonify(new_todo), 201
 
 @app.route('/todos/<int:todo_id>', methods=['PUT'])
 def update_todo(todo_id):
