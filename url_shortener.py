@@ -63,4 +63,4 @@ def delete_url(short_code):
     return jsonify({'message': "URL deleted successfully"}), 200
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5170)
+    app.run(debug=False, host='0.0.0.0')
