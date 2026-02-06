@@ -32,7 +32,7 @@ def init_db():
 
 def get_db():
     conn = sqlite3.connect(db)
-    conn.row_factory = sqlite3.Row
+    conn.row_factory = sqlite3.Row #to get row access
     return conn
 
 init_db()
@@ -40,9 +40,17 @@ init_db()
 #ROUTES AND ENDPOINTs
 @app.route("/")
 def get_home():
-    return jsonify({"message": "Welcome to Personal finance",
-         "endpoints":{"POST /transactions": "Create a tansaction"
-    }})
+    return jsonify({
+        "message": "Personal Finance Tracker API - SQLite3 Version",
+        "endpoints": {
+            "POST /transactions": "Add a transaction",
+            "GET /transactions": "Get all transactions",
+            "GET /transactions/<id>": "Get single transaction",
+            "DELETE /transactions/<id>": "Delete transaction",
+            "GET /balance": "Get current balance",
+            "GET /summary": "Get financial summary",
+            "GET /spending-by-category": "Get spending grouped by category"
+        }})
 
 @app.route("/transactions", methods=["POST"])
 def create_trans():
@@ -64,7 +72,7 @@ def create_trans():
 
     created = datetime.datetime.now().isoformat()
 
-    conn = sqlite3.connect(db)
+    conn = get_db()
     curs = conn.cursor()
 
     curs.execute("""
@@ -80,11 +88,36 @@ def create_trans():
 
 @app.route("/transactions", methods=["GET"])
 def  get_trans():
+
+    trans_type = request.args.get('type')
+    category = request.args.get('category')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+
     conn = get_db()
-    curs = conn.cursor()
-    results = curs.execute("""SELECT * FROM transactions""").fetchall()
+
+    query = 'SELECT * FROM transactions WHERE 1=1'
+    params = []
+
+    if trans_type:
+        query += 'AND type = ?'
+        params.append(trans_type)
+    
+    if category:
+        query += 'AND type = ?'
+        params.append(category)
+    
+    if start_date:
+        query += 'AND type = ?'
+        params.append(start_date)
+    
+    if end_date:
+        query += 'AND type = ?'
+        params.append(end_date)
+    
+    transactions = conn.execute(query, params).fetchall()
     conn.close()
-    result = [dict(t) for t in results]
+    result = [dict(t) for t in transactions]
     return jsonify({"transactions": result}), 200
 
 
